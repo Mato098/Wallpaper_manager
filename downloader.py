@@ -46,65 +46,6 @@ def download_link(link: str):
         os.popen(f'cd {PTH} && curl -O {img_link}')
 
 
-def category():
-    global BASEURL
-    print('''
-    ****************************************************************
-                            Category Codes
-    all     - Every wallpaper.
-    general - For 'general' wallpapers only.
-    anime   - For 'Anime' Wallpapers only.
-    people  - For 'people' wallapapers only.
-    ga      - For 'General' and 'Anime' wallapapers only.
-    gp      - For 'General' and 'People' wallpapers only.
-    ****************************************************************
-    ''')
-    ccode = input('Enter Category: ').lower()
-    ctags = {'all': '111', 'anime': '010', 'general': '100', 'people': '001', 'ga': '110', 'gp': '101'}
-    ctag = ctags[ccode]
-
-    print('''
-    ****************************************************************
-                            Purity Codes
-    sfw     - For 'Safe For Work'
-    sketchy - For 'Sketchy'
-    nsfw    - For 'Not Safe For Work'
-    ws      - For 'SFW' and 'Sketchy'
-    wn      - For 'SFW' and 'NSFW'
-    sn      - For 'Sketchy' and 'NSFW'
-    all     - For 'SFW', 'Sketchy' and 'NSFW'
-    ****************************************************************
-    ''')
-    pcode = input('Enter Purity: ')
-    ptags = {'sfw': '100', 'sketchy': '010', 'nsfw': '001', 'ws': '110', 'wn': '101', 'sn': '011', 'all': '111'}
-    ptag = ptags[pcode]
-
-    BASEURL = 'https://wallhaven.cc/api/v1/search?apikey=' + APIKEY + "&categories=" + \
-              ctag + '&purity=' + ptag + '&ratios=16x9&page='
-
-
-def latest():
-    global BASEURL
-    print('Downloading latest')
-    topListRange = '1M'
-    BASEURL = 'https://wallhaven.cc/api/v1/search?apikey=' + APIKEY + '&topRange=' + \
-              topListRange + '&sorting=toplist&page='
-
-
-def favorites():
-    global BASEURL
-    print('Downloading favorites')
-    topListRange = '1M'
-    BASEURL = 'https://wallhaven.cc/api/v1/search?apikey=' + APIKEY + '&topRange=' + \
-              topListRange + '&sorting=favorites&page='
-
-
-def search():
-    global BASEURL
-    query = input('Enter search query: ')
-    BASEURL = 'https://wallhaven.cc/api/v1/search?apikey=' + APIKEY + '&q=' + \
-              urllib.parse.quote_plus(query) + '&page='
-
 
 def downloadPage(pageId, totalImage):
     url = BASEURL + str(pageId)
@@ -119,7 +60,7 @@ def downloadPage(pageId, totalImage):
         url = pageData[i]["path"]
 
         filename = os.path.basename(url)
-        osPath = os.path.join('Wallhaven', filename)
+        osPath = os.path.join(PTH, filename)
         if not os.path.exists(osPath):
             imgreq = requests.get(url, cookies=cookies)
             if imgreq.status_code == 200:
@@ -264,32 +205,7 @@ def main():
     sfw_c.state(['selected'])
 
     tk.mainloop()
+    
 
 if __name__ == '__main__':
     main()
-"""Choice = input('''Choose how you want to download the image:
-    Enter "category" for downloading wallpapers from specified categories
-    Enter "latest" for downloading latest wallpapers
-    Enter "favorites" for downloading top favorites
-    Enter "search" for downloading wallpapers from search
-    Enter choice: ''').lower()
-    while Choice not in ['category', 'latest', 'search', 'favorites']:
-        if Choice is not None:
-            print('You entered an incorrect value.')
-        choice = input('Enter choice: ')
-
-    if Choice == 'category':
-        category()
-    elif Choice == 'latest':
-        latest()
-    elif Choice == 'search':
-        search()
-    elif Choice == 'favorites':
-        favorites()
-
-    pgid = int(input('How Many pages you want to Download: '))
-    totalImageToDownload = str(24 * pgid)
-    print('Number of Wallpapers to Download: ' + totalImageToDownload)
-    for j in range(1, pgid + 1):
-        downloadPage(j, totalImageToDownload)"""
-

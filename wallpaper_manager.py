@@ -1,4 +1,3 @@
-import distutils.filelist
 import json
 import tkinter as tk
 import tkinter.messagebox
@@ -17,6 +16,7 @@ def load_settings():
     set_key(key)
     set_pth(pth)
 
+
 def set_key(key: str):
     downloader.APIKEY = key
     global APIKEY
@@ -31,6 +31,7 @@ def set_key(key: str):
     global apikey_l
     apikey_l.config(text=f'Your API key: {APIKEY}')
 
+
 def set_pth(path: str):
     downloader.PTH = path
     global PTH
@@ -44,6 +45,7 @@ def set_pth(path: str):
     f.close()
     global path_l
     path_l.config(text=f'Path to download directory: {PTH}')
+
 
 def path_auto():
     filepth_lst = re.split('\\\\', os.path.realpath(__file__))
@@ -148,10 +150,12 @@ def pls_wait_window(func):
     tkinter.messagebox.showinfo('pls wait', 'Working, this might take a while..')
     func()
 
+
 def edit_path():
     get_text_and_run('! Images will not be moved to new directory', set_pth)
 
-def  delete_duplicates():#TODO
+
+def delete_duplicates():#TODO
     pass
 
 
@@ -197,8 +201,6 @@ apikey_l = tk.Label(window, text=f'Your API key: {APIKEY}')
 apikey_l.grid(column=0, row=8, columnspan=3)
 edit_key_b = tk.Button(window, text='Edit API key', command=edit_api_key)
 edit_key_b.grid(column=0, row=9, columnspan=3)
-
-
 
 
 load_settings()
