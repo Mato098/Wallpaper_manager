@@ -205,7 +205,7 @@ def main():
     sfw_c.state(['selected'])
 
     tk.mainloop()
-    
+
 
 if __name__ == '__main__':
     main()

@@ -9,7 +9,7 @@ import cleanup, os, re, time, subprocess
 def load_settings():
     key = ''
     pth = ''
-    with open('settings.json', 'r') as f:
+    with open(os.path.join(path_auto(), 'settings.json'), 'r') as f:
         data = json.load(f)
         key = data['api_key']
         pth = data['download_directory']
@@ -20,12 +20,13 @@ def load_settings():
 def set_key(key: str):
     downloader.APIKEY = key
     global APIKEY
+    global PTH
     APIKEY = key
-    f = open('settings.json', 'r')
+    f = open(os.path.join(path_auto(), 'settings.json'), 'r')
     data = json.load(f)
     data['api_key'] = key
     f.close()
-    f = open('settings.json', 'w')
+    f = open(os.path.join(path_auto(), 'settings.json'), 'w')
     json.dump(data, f)
     f.close()
     global apikey_l
@@ -36,11 +37,11 @@ def set_pth(path: str):
     downloader.PTH = path
     global PTH
     PTH = path
-    f = open('settings.json', 'r')
+    f = open(os.path.join(path_auto(), 'settings.json'), 'r')
     data = json.load(f)
     data['download_directory'] = path
     f.close()
-    f = open('settings.json', 'w')
+    f = open(os.path.join(path_auto(), 'settings.json'), 'w')
     json.dump(data, f)
     f.close()
     global path_l
@@ -50,7 +51,7 @@ def set_pth(path: str):
 def path_auto():
     filepth_lst = re.split('\\\\', os.path.realpath(__file__))
     filepth_lst.insert(1, os.sep)
-    PTH = os.path.join(*filepth_lst[:-1], 'Wallhaven')
+    PTH = os.path.join(*filepth_lst[:-1])
     print(PTH)
     return PTH
 
@@ -136,9 +137,10 @@ add-type $code
             break
         elif i < 1:
             cleanup.cleanup()
-            break
+            continue
         if i == 1:
             curr_num = 0
+            print('going back to 1')
     time.sleep(0.5)
 
 
@@ -155,7 +157,7 @@ def edit_path():
     get_text_and_run('! Images will not be moved to new directory', set_pth)
 
 
-def delete_duplicates():#TODO
+def delete_duplicates():#TODO - delete duplicates, wallpaper change scheduler, open destination folder, delete current wallpaper
     pass
 
 
@@ -167,7 +169,7 @@ PTH = ''
 window = tk.Tk()
 
 window.title("Mato's Wallpaper Manager")
-window.geometry('500x230')
+window.geometry('580x230')
 
 download_l = tk.Label(window, text="Download")
 download_l.grid(column=0, row=0)
