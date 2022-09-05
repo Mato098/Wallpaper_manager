@@ -1,7 +1,5 @@
 # Wallpaper_manager
 
-A wallpaper manager to download, manage and enjoy wallpapers
-
-works with wallhaven.cc
+Mainly a Wallhaven.cc wallpaper downloader and manager
 
 (very much WIP)
