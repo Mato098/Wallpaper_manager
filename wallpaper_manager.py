@@ -1,3 +1,12 @@
+########################################################
+#     Wallpaper Manager with wallhaven.cc integration  #
+#                                                      #
+#                  Author - Mato098                    #
+#                                                      #
+#                  Dated - Sept 2022                   #
+########################################################
+
+
 import json
 import tkinter as tk
 import tkinter.messagebox
@@ -203,7 +212,6 @@ apikey_l = tk.Label(window, text=f'Your API key: {APIKEY}')
 apikey_l.grid(column=0, row=8, columnspan=3)
 edit_key_b = tk.Button(window, text='Edit API key', command=edit_api_key)
 edit_key_b.grid(column=0, row=9, columnspan=3)
-
 
 load_settings()
 

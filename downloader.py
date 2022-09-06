@@ -2,10 +2,11 @@
 #        Program to Download Wallpapers from           #
 #                  alpha.wallhaven.cc                  #
 #                                                      #
-#                 Author - Saurabh Bhan                #
+#              Original Author - Saurabh Bhan          #
+#          GUI and additional features by Mato098      #  
 #                                                      #
 #                  Dated- 26 June 2016                 #
-#                 Update - 11 June 2019                #
+#                  Update - Sept 2022                  #
 ########################################################
 import hashlib
 import os
@@ -16,14 +17,17 @@ import re
 import tkinter as tk
 from tkinter import ttk
 
-os.makedirs('Wallhaven', exist_ok=True)
+
 BASEURL = ""
 cookies = dict()
 
 global APIKEY
 global PTH
 
+
 def download_link(link: str):
+    global PTH
+    os.makedirs(PTH, exist_ok=True)
     if link[:4] != 'http':
         print('bad URL')
         return
@@ -46,8 +50,7 @@ def download_link(link: str):
         os.popen(f'cd {PTH} && curl -O {img_link}')
 
 
-
-def downloadPage(pageId, totalImage):
+def download_page(pageId, totalImage):
     url = BASEURL + str(pageId)
     print(url)
     urlreq = requests.get(url, cookies=cookies)
@@ -74,20 +77,22 @@ def downloadPage(pageId, totalImage):
             print("%s already exist - %s / %s" % (filename, currentImage, totalImage))
 
 
-def Image_md5hash(im_file):
+def image_md5hash(im_file):
     im = tk.Image.open(im_file)
     return hashlib.md5(im.tostring()).hexdigest()
 
 
+def get_3val_binary(args) -> str:
+    num = ''
+    for i in range(len(args)):
+        num += ('1' if args[i].instate(['selected']) else '0')
+    return num
+
+
 def main():
-
-    def get_3val_binary(args) -> str:#fst arg=1, second=10, third=100 -> 111
-        num = ''
-        for i in range(len(args)):
-            num += ('1' if args[i].instate(['selected']) else '0')
-        return num
-
     def parse_gui():
+        global PTH
+        os.makedirs(PTH, exist_ok=True)
         sort_mode = 'views'
         for i in sort_lst:
             if i.instate(['selected']):
@@ -96,17 +101,18 @@ def main():
         purity = get_3val_binary([sfw_c, sketchy_c, nsfw_c])
         categories = get_3val_binary([cat_general_c, cat_anime_c, cat_people_c])
         global BASEURL
-        BASEURL = 'https://wallhaven.cc/api/v1/search?apikey='\
-                  + APIKEY + '&topRange=' + sort_toplist_txt.get() + f'&atleast={resolution_txt_var.get()}&ratios={ratio_txt_var.get()}&order=desc&sorting={sort_mode}&purity={purity}&categories={categories}&page='
-#
-        pgid = int(pages_txt_var.get())
-        totalImageToDownload = str(24 * pgid)
-        print('Number of Wallpapers to Download: ' + totalImageToDownload)
-        downloadoffset = int(pages_from_txt_var.get())
+        BASEURL = 'https://wallhaven.cc/api/v1/search?apikey=' + APIKEY + '&topRange=' + sort_toplist_txt.get()\
+                  + f'&atleast={resolution_txt_var.get()}&ratios={ratio_txt_var.get()}&order=desc&sorting={sort_mode}' \
+                  f'&purity={purity}&categories={categories}&page='
 
-        for j in range(downloadoffset, downloadoffset + pgid):
+        pgid = int(pages_txt_var.get())
+        total_img_to_download = str(24 * pgid)
+        print('Number of Wallpapers to Download: ' + total_img_to_download)
+        download_offset = int(pages_from_txt_var.get())
+
+        for j in range(download_offset, download_offset + pgid):
             pass
-            downloadPage(j, totalImageToDownload)
+            download_page(j, total_img_to_download)
 
     window = tk.Tk()
     window.title("API downloader")
@@ -163,8 +169,8 @@ def main():
     sort_toplist_c.grid(column=2, row=6, sticky='W')
     toplist_txt_var = tk.StringVar()
     sort_toplist_txt = tk.Entry(window, textvariable=toplist_txt_var)
-    sort_toplist_txt.insert(0, '1M')
-    toplist_txt_var.set('1M')
+    sort_toplist_txt.insert(0, '3M')
+    toplist_txt_var.set('3M')
     sort_toplist_txt.grid(column=1, row=6)
     sort_hot_c = ttk.Checkbutton(window, text='hot')
     sort_hot_c.grid(column=2, row=7, sticky='W')

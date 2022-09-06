@@ -3,8 +3,6 @@ from time import sleep
 import os
 
 import re
-import requests
-
 
 
 def key_fun(name) -> int:
