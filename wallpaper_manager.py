@@ -16,6 +16,7 @@ import downloader
 import cleanup
 from difPy import dif
 
+
 def load_settings():
     key = ''
     pth = ''
@@ -91,11 +92,13 @@ def get_text_and_run(text, func):
 
 def download_link():
     get_text_and_run("Made for wallhaven.cc, will not work for other sites", downloader.download_link)
+    time.sleep(2)
     cleanup.cleanup()
 
 
 def download_api():
     downloader.main()
+    time.sleep(2)
     cleanup.cleanup()
 
 
@@ -152,6 +155,38 @@ add-type $code
             curr_num = 0
             print('going back to 1')
     time.sleep(0.5)
+    update_curr_wallpaper_label()
+
+
+def delete_wallpaper():
+    startupinfo = subprocess.STARTUPINFO()
+    startupinfo.dwFlags |= subprocess.STARTF_USESHOWWINDOW
+
+    process = subprocess.Popen(["powershell.exe",
+                                "Split-Path (Get-ItemProperty -Path \"HKCU:\Control Panel\Desktop\" -Name Wallpaper).Wallpaper -Leaf"],
+                               stdout=subprocess.PIPE, startupinfo=startupinfo)
+
+    out, err = process.communicate()
+    curr_num = int(re.sub("[^0-9]", "", str(out)))
+    cycle_wallpaper()
+    os.popen(f'cd {PTH} && DEL {curr_num}.*')
+    update_curr_wallpaper_label()
+
+
+def update_curr_wallpaper_label():
+    global wallpap_name_l
+    startupinfo = subprocess.STARTUPINFO()
+    startupinfo.dwFlags |= subprocess.STARTF_USESHOWWINDOW
+
+    process = subprocess.Popen(["powershell.exe",
+                                "Split-Path (Get-ItemProperty -Path \"HKCU:\Control Panel\Desktop\" -Name Wallpaper).Wallpaper -Leaf"],
+                               stdout=subprocess.PIPE, startupinfo=startupinfo)
+
+    out, err = process.communicate()
+    curr_num = re.sub("[^0-9.jpg]", "", str(out))
+    if curr_num[-3:] == '.pg':
+        curr_num = curr_num[:-3] + '.png'
+    wallpap_name_l.config(text=f'Current wallpaper: {curr_num}')
 
 
 def run_cleanup():
@@ -174,6 +209,8 @@ def open_path():
 def delete_duplicates():  # TODO - wallpaper change scheduler, delete current wallpaper, terminal output
     a = dif(PTH, similarity="normal", px_size=50,
             show_progress=True, show_output=False, delete=True, silent_del=True)
+    time.sleep(1)
+    cleanup.cleanup()
 
 
 global APIKEY
@@ -203,8 +240,12 @@ cleanup_l = tk.Label(window, text='sort, delete dud files')
 cleanup_l.grid(column=1, row=2)
 duplicates_b = tk.Button(window, text='Delete duplicates, cleanup', command=delete_duplicates)
 duplicates_b.grid(column=1, row=3)
+wallpap_name_l = tk.Label(window, text=f'Current wallpaper: ')
+wallpap_name_l.grid(column=2, row=0)
 cycle_b = tk.Button(window, text='Cycle wallpaper', command=cycle_wallpaper)
 cycle_b.grid(column=2, row=1)
+del_b = tk.Button(window, text='Delete current wallpaper', command=delete_wallpaper)
+del_b.grid(column=2, row=2)
 
 dud = tk.Label(window)
 dud.grid(column=0, row=5)
@@ -213,8 +254,8 @@ path_l = tk.Label(window, text=f'Path to download directory: {PTH}')
 path_l.grid(column=0, row=6, columnspan=3)
 path_b = tk.Button(window, text='Edit path', command=edit_path)
 path_b.grid(column=0, row=7, columnspan=3)
-path_b = tk.Button(window, text='Open folder', command=open_path)
-path_b.grid(column=2, row=7)
+open_b = tk.Button(window, text='Open folder', command=open_path)
+open_b.grid(column=2, row=7)
 
 apikey_l = tk.Label(window, text=f'Your API key: {APIKEY}')
 apikey_l.grid(column=0, row=8, columnspan=3)
@@ -222,5 +263,6 @@ edit_key_b = tk.Button(window, text='Edit API key', command=edit_api_key)
 edit_key_b.grid(column=0, row=9, columnspan=3)
 
 load_settings()
+update_curr_wallpaper_label()
 
 window.mainloop()
