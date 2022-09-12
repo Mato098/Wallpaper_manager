@@ -11,9 +11,10 @@ import json
 import tkinter as tk
 import tkinter.messagebox
 
+import os, re, time, subprocess
 import downloader
-import cleanup, os, re, time, subprocess
-
+import cleanup
+from difPy import dif
 
 def load_settings():
     key = ''
@@ -61,7 +62,6 @@ def path_auto():
     filepth_lst = re.split('\\\\', os.path.realpath(__file__))
     filepth_lst.insert(1, os.sep)
     PTH = os.path.join(*filepth_lst[:-1])
-    print(PTH)
     return PTH
 
 
@@ -96,6 +96,7 @@ def download_link():
 
 def download_api():
     downloader.main()
+    cleanup.cleanup()
 
 
 def edit_api_key():
@@ -166,8 +167,13 @@ def edit_path():
     get_text_and_run('! Images will not be moved to new directory', set_pth)
 
 
-def delete_duplicates():#TODO - delete duplicates, wallpaper change scheduler, open destination folder, delete current wallpaper
-    pass
+def open_path():
+    subprocess.Popen(['powershell.exe', f'explorer {PTH}'])
+
+
+def delete_duplicates():  # TODO - wallpaper change scheduler, delete current wallpaper, terminal output
+    a = dif(PTH, similarity="normal", px_size=50,
+            show_progress=True, show_output=False, delete=True, silent_del=True)
 
 
 global APIKEY
@@ -207,6 +213,8 @@ path_l = tk.Label(window, text=f'Path to download directory: {PTH}')
 path_l.grid(column=0, row=6, columnspan=3)
 path_b = tk.Button(window, text='Edit path', command=edit_path)
 path_b.grid(column=0, row=7, columnspan=3)
+path_b = tk.Button(window, text='Open folder', command=open_path)
+path_b.grid(column=2, row=7)
 
 apikey_l = tk.Label(window, text=f'Your API key: {APIKEY}')
 apikey_l.grid(column=0, row=8, columnspan=3)

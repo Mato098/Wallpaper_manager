@@ -30,7 +30,7 @@ def cleanup():
                 n += 1
                 continue
 
-            if name[0].isdigit() and not rename_rest:
+            if name[:-3].isdigit() and not rename_rest:
                 number = int(re.findall("[0-9]*", name)[0])
 
                 if number - last_numbered_file != 1:

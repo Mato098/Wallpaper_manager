@@ -8,10 +8,8 @@
 #                  Dated- 26 June 2016                 #
 #                  Update - Sept 2022                  #
 ########################################################
-import hashlib
 import os
 import requests
-import urllib
 import json
 import re
 import tkinter as tk
@@ -45,7 +43,7 @@ def download_link(link: str):
     img_ids = list(map(lambda a: a[1:-1], img_ids))
     print(img_ids)
 
-    for i in range(len(img_ids)):
+    for i in range(len(img_ids)):  # TODO this will not download png files, needs fix
         img_link = f'https://w.wallhaven.cc/full/{img_ids[i][0:2]}/wallhaven-{img_ids[i]}.jpg'
         os.popen(f'cd {PTH} && curl -O {img_link}')
 
@@ -75,11 +73,6 @@ def download_page(pageId, totalImage):
                 print("Unable to download %s - %s / %s" % (filename, currentImage, totalImage))
         else:
             print("%s already exist - %s / %s" % (filename, currentImage, totalImage))
-
-
-def image_md5hash(im_file):
-    im = tk.Image.open(im_file)
-    return hashlib.md5(im.tostring()).hexdigest()
 
 
 def get_3val_binary(args) -> str:
