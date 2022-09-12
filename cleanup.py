@@ -12,7 +12,7 @@ def key_fun(name) -> int:
     return int(num_str)
 
 
-def cleanup():
+def cleanup():  # TODO this will not work  if download folder is somwhere else
     w = os.path.abspath('Wallhaven') + os.sep
     dirlist = os.listdir(w[:-1])
     dirlist.sort(key=key_fun)

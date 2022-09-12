@@ -107,15 +107,8 @@ def edit_api_key():
 
 
 def cycle_wallpaper():
-    startupinfo = subprocess.STARTUPINFO()
-    startupinfo.dwFlags |= subprocess.STARTF_USESHOWWINDOW
-
-    process = subprocess.Popen(["powershell.exe",
-                                "Split-Path (Get-ItemProperty -Path \"HKCU:\Control Panel\Desktop\" -Name Wallpaper).Wallpaper -Leaf"],
-                               stdout=subprocess.PIPE, startupinfo=startupinfo)
-
-    out, err = process.communicate()
-    curr_num = int(re.sub("[^0-9]", "", str(out)))
+    name = get_wallpaper_name()
+    curr_num = int(re.sub("[^0-9]", "", str(name)))
     filepth_lst = re.split('\\\\', os.path.realpath(__file__))
     filepth_lst.insert(1, os.sep)
     global PTH
@@ -157,8 +150,8 @@ add-type $code
     time.sleep(0.5)
     update_curr_wallpaper_label()
 
-
-def delete_wallpaper():
+    
+def get_wallpaper_name():
     startupinfo = subprocess.STARTUPINFO()
     startupinfo.dwFlags |= subprocess.STARTF_USESHOWWINDOW
 
@@ -167,7 +160,12 @@ def delete_wallpaper():
                                stdout=subprocess.PIPE, startupinfo=startupinfo)
 
     out, err = process.communicate()
-    curr_num = int(re.sub("[^0-9]", "", str(out)))
+    return out
+
+
+def delete_wallpaper():
+    name = get_wallpaper_name()
+    curr_num = int(re.sub("[^0-9]", "", str(name)))
     cycle_wallpaper()
     os.popen(f'cd {PTH} && DEL {curr_num}.*')
     update_curr_wallpaper_label()
@@ -175,15 +173,8 @@ def delete_wallpaper():
 
 def update_curr_wallpaper_label():
     global wallpap_name_l
-    startupinfo = subprocess.STARTUPINFO()
-    startupinfo.dwFlags |= subprocess.STARTF_USESHOWWINDOW
-
-    process = subprocess.Popen(["powershell.exe",
-                                "Split-Path (Get-ItemProperty -Path \"HKCU:\Control Panel\Desktop\" -Name Wallpaper).Wallpaper -Leaf"],
-                               stdout=subprocess.PIPE, startupinfo=startupinfo)
-
-    out, err = process.communicate()
-    curr_num = re.sub("[^0-9.jpg]", "", str(out))
+    name = get_wallpaper_name()
+    curr_num = re.sub("[^0-9.jpg]", "", str(name))
     if curr_num[-3:] == '.pg':
         curr_num = curr_num[:-3] + '.png'
     wallpap_name_l.config(text=f'Current wallpaper: {curr_num}')
@@ -206,7 +197,7 @@ def open_path():
     subprocess.Popen(['powershell.exe', f'explorer {PTH}'])
 
 
-def delete_duplicates():  # TODO - wallpaper change scheduler, delete current wallpaper, terminal output
+def delete_duplicates():  # TODO - wallpaper change scheduler, terminal output
     a = dif(PTH, similarity="normal", px_size=50,
             show_progress=True, show_output=False, delete=True, silent_del=True)
     time.sleep(1)
