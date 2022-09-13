@@ -32,7 +32,7 @@ def download_link(link: str):
     r = requests.get(link)
     print(r)
     code = r.content
-    small_links = re.findall("small/[0-9a-z/]*\.jpg", str(code))
+    small_links = re.findall("small/[0-9a-z/]*\....", str(code))
     print("found", len(small_links), "links")
 
     concat = ""
@@ -43,9 +43,12 @@ def download_link(link: str):
     img_ids = list(map(lambda a: a[1:-1], img_ids))
     print(img_ids)
 
-    for i in range(len(img_ids)):  # TODO this will not download png files, needs fix
-        img_link = f'https://w.wallhaven.cc/full/{img_ids[i][0:2]}/wallhaven-{img_ids[i]}.jpg'
-        os.popen(f'cd {PTH} && curl -O {img_link}')
+    for i in range(len(img_ids)):
+        url = f'https://w.wallhaven.cc/full/{img_ids[i][0:2]}/wallhaven-{img_ids[i]}.jpg'
+        if requests.get(url).status_code == 200:
+            os.popen(f'cd {PTH} && curl -O {url}')
+        else:
+            os.popen(f'cd {PTH} && curl -O {url[:-3] + "png"}')
 
 
 def download_page(pageId, totalImage):

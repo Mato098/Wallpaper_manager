@@ -92,8 +92,8 @@ def get_text_and_run(text, func):
 
 def download_link():
     get_text_and_run("Made for wallhaven.cc, will not work for other sites", downloader.download_link)
-    time.sleep(2)
-    cleanup.cleanup()
+    time.sleep(1)
+    #cleanup.cleanup()
 
 
 def download_api():
@@ -132,6 +132,8 @@ namespace Win32{
 add-type $code 
 [Win32.Wallpaper]::SetWallpaper($MyWallpaper)
 }'''
+    startupinfo = subprocess.STARTUPINFO()
+    startupinfo.dwFlags |= subprocess.STARTF_USESHOWWINDOW
     for i in range(3):
         if os.path.exists(f'{PTH}\\{curr_num + 1}.png'):
             subprocess.Popen(['powershell.exe', f'{a}; Set-Wallpaper(\"{PTH}\\{curr_num + 1}.png\")'],
@@ -150,7 +152,7 @@ add-type $code
     time.sleep(0.5)
     update_curr_wallpaper_label()
 
-    
+
 def get_wallpaper_name():
     startupinfo = subprocess.STARTUPINFO()
     startupinfo.dwFlags |= subprocess.STARTF_USESHOWWINDOW
