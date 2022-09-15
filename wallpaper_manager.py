@@ -8,6 +8,7 @@
 
 
 import json
+import sys
 import tkinter as tk
 import tkinter.messagebox
 
@@ -41,7 +42,10 @@ def set_key(key: str):
     json.dump(data, f)
     f.close()
     global apikey_l
-    apikey_l.config(text=f'Your API key: {APIKEY}')
+    try:
+        apikey_l.config(text=f'Your API key: {APIKEY}')
+    except:
+        pass
 
 
 def set_pth(path: str):
@@ -56,8 +60,10 @@ def set_pth(path: str):
     json.dump(data, f)
     f.close()
     global path_l
-    path_l.config(text=f'Path to download directory: {PTH}')
-
+    try:
+        path_l.config(text=f'Path to download directory: {PTH}')
+    except:
+        pass
 
 def path_auto():
     filepth_lst = re.split('\\\\', os.path.realpath(__file__))
@@ -92,14 +98,14 @@ def get_text_and_run(text, func):
 
 def download_link():
     get_text_and_run("Made for wallhaven.cc, will not work for other sites", downloader.download_link)
-    time.sleep(1)
-    #cleanup.cleanup()
+    #time.sleep(1)
+    #cleanup.cleanup(PTH)
 
 
 def download_api():
     downloader.main()
     time.sleep(2)
-    cleanup.cleanup()
+    cleanup.cleanup(PTH)
 
 
 def edit_api_key():
@@ -144,14 +150,16 @@ add-type $code
                              startupinfo=startupinfo)
             break
         elif i < 1:
-            cleanup.cleanup()
+            cleanup.cleanup(PTH)
             continue
         if i == 1:
             curr_num = 0
             print('going back to 1')
     time.sleep(0.5)
-    update_curr_wallpaper_label()
-
+    try:
+        update_curr_wallpaper_label()
+    except:
+        pass
 
 def get_wallpaper_name():
     startupinfo = subprocess.STARTUPINFO()
@@ -174,21 +182,16 @@ def delete_wallpaper():
 
 
 def update_curr_wallpaper_label():
-    global wallpap_name_l
     name = get_wallpaper_name()
     curr_num = re.sub("[^0-9.jpg]", "", str(name))
     if curr_num[-3:] == '.pg':
         curr_num = curr_num[:-3] + '.png'
+    global wallpap_name_l
     wallpap_name_l.config(text=f'Current wallpaper: {curr_num}')
 
 
 def run_cleanup():
-    pls_wait_window(cleanup.cleanup)
-
-
-def pls_wait_window(func):
-    tkinter.messagebox.showinfo('pls wait', 'Working, this might take a while..')
-    func()
+    cleanup.cleanup(PTH)
 
 
 def edit_path():
@@ -203,59 +206,116 @@ def delete_duplicates():  # TODO - wallpaper change scheduler, terminal output
     a = dif(PTH, similarity="normal", px_size=50,
             show_progress=True, show_output=False, delete=True, silent_del=True)
     time.sleep(1)
-    cleanup.cleanup()
+    cleanup.cleanup(PTH)
 
 
-global APIKEY
+def clear_schedule():
+    os.system('SchTasks /Delete /TN "Wallpaper_task" /f')
+
+
+def schedule_hourly():
+    global python_install_dir
+    clear_schedule()
+    os.system(f'SchTasks /Create /SC HOURLY /TN "Wallpaper_task" /TR "{python_install_dir} {os.path.abspath("schedule_worker.py")}" /ST {schedule_time_txt_var.get()}')
+
+
+def schedule_daily():
+    global python_install_dir
+    clear_schedule()
+    os.system(f'SchTasks /Create /SC DAILY /TN "Wallpaper_task" /TR "{python_install_dir} {os.path.abspath("schedule_worker.py")}" /ST {schedule_time_txt_var.get()}')
+
+
+def schedule_weekly():
+    global python_install_dir
+    clear_schedule()
+    os.system(f'SchTasks /Create /SC WEEKLY /TN "Wallpaper_task" /TR "{python_install_dir} {os.path.abspath("schedule_worker.py")}" /ST {schedule_time_txt_var.get()}')
+
+
 APIKEY = ''
-global PTH
 PTH = ''
+python_install_dir = r'C:\Users\Martin\AppData\Local\Programs\Python\Python38\pythonw.exe'
 
-window = tk.Tk()
+wallpap_name_l = 0
+path_l = 0
+apikey_l = 0
+schedule_time_txt_var = 0
 
-window.title("Mato's Wallpaper Manager")
-window.geometry('580x230')
 
-download_l = tk.Label(window, text="Download")
-download_l.grid(column=0, row=0)
+def main():
+    global wallpap_name_l
+    global path_l
+    global apikey_l
+    global schedule_time_txt_var
 
-link_b = tk.Button(window, text="Download via link", command=download_link)
-link_b.grid(column=0, row=1)
+    window = tk.Tk()
 
-download_api_b = tk.Button(window, text='Download via API', command=download_api)
-download_api_b.grid(column=0, row=2)
+    window.title("Mato's Wallpaper Manager")
+    window.geometry('600x250')
 
-manage_l = tk.Label(window, text='Manage')
-manage_l.grid(column=1, row=0)
-cleanup_b = tk.Button(window, text='Run cleanup', command=run_cleanup)
-cleanup_b.grid(column=1, row=1)
-cleanup_l = tk.Label(window, text='sort, delete dud files')
-cleanup_l.grid(column=1, row=2)
-duplicates_b = tk.Button(window, text='Delete duplicates, cleanup', command=delete_duplicates)
-duplicates_b.grid(column=1, row=3)
-wallpap_name_l = tk.Label(window, text=f'Current wallpaper: ')
-wallpap_name_l.grid(column=2, row=0)
-cycle_b = tk.Button(window, text='Cycle wallpaper', command=cycle_wallpaper)
-cycle_b.grid(column=2, row=1)
-del_b = tk.Button(window, text='Delete current wallpaper', command=delete_wallpaper)
-del_b.grid(column=2, row=2)
+    download_l = tk.Label(window, text="Download")
+    download_l.grid(column=0, row=0)
 
-dud = tk.Label(window)
-dud.grid(column=0, row=5)
+    link_b = tk.Button(window, text="Download via link", command=download_link)
+    link_b.grid(column=0, row=1)
 
-path_l = tk.Label(window, text=f'Path to download directory: {PTH}')
-path_l.grid(column=0, row=6, columnspan=3)
-path_b = tk.Button(window, text='Edit path', command=edit_path)
-path_b.grid(column=0, row=7, columnspan=3)
-open_b = tk.Button(window, text='Open folder', command=open_path)
-open_b.grid(column=2, row=7)
+    download_api_b = tk.Button(window, text='Download via API', command=download_api)
+    download_api_b.grid(column=0, row=2)
 
-apikey_l = tk.Label(window, text=f'Your API key: {APIKEY}')
-apikey_l.grid(column=0, row=8, columnspan=3)
-edit_key_b = tk.Button(window, text='Edit API key', command=edit_api_key)
-edit_key_b.grid(column=0, row=9, columnspan=3)
+    manage_l = tk.Label(window, text='Manage')
+    manage_l.grid(column=1, row=0)
+    cleanup_b = tk.Button(window, text='Run cleanup', command=run_cleanup)
+    cleanup_b.grid(column=1, row=1)
+    cleanup_l = tk.Label(window, text='sort, delete dud files')
+    cleanup_l.grid(column=1, row=2)
+    duplicates_b = tk.Button(window, text='Delete duplicates, cleanup', command=delete_duplicates)
+    duplicates_b.grid(column=1, row=3)
+    wallpap_name_l = tk.Label(window, text=f'Current wallpaper: ')
+    wallpap_name_l.grid(column=2, row=0)
+    cycle_b = tk.Button(window, text='Cycle wallpaper', command=cycle_wallpaper)
+    cycle_b.grid(column=2, row=1)
+    del_b = tk.Button(window, text='Delete current wallpaper', command=delete_wallpaper)
+    del_b.grid(column=2, row=2)
 
-load_settings()
-update_curr_wallpaper_label()
+    dud = tk.Label(window)
+    dud.grid(column=0, row=5)
 
-window.mainloop()
+    path_l = tk.Label(window, text=f'Path to download directory: {PTH}')
+    path_l.grid(column=0, row=6, columnspan=3)
+    path_b = tk.Button(window, text='Edit path', command=edit_path)
+    path_b.grid(column=0, row=7, columnspan=3)
+    open_b = tk.Button(window, text='Open folder', command=open_path)
+    open_b.grid(column=2, row=7)
+
+    apikey_l = tk.Label(window, text=f'Your API key: {APIKEY}')
+    apikey_l.grid(column=0, row=8, columnspan=3)
+    edit_key_b = tk.Button(window, text='Edit API key', command=edit_api_key)
+    edit_key_b.grid(column=0, row=9, columnspan=3)
+
+    schedule_l = tk.Label(window, text=f'Set scheduled change')
+    schedule_l.grid(column=3, row=0)
+    schedule_h_b = tk.Button(window, text='Set hourly', command=schedule_hourly)
+    schedule_h_b.grid(column=3, row=1)
+    schedule_d_b = tk.Button(window, text='Set daily', command=schedule_daily)
+    schedule_d_b.grid(column=3, row=2)
+    schedule_w_b = tk.Button(window, text='Set weekly', command=schedule_weekly)
+    schedule_w_b.grid(column=3, row=3)
+    schedule_w_b = tk.Button(window, text='Clear schedule', command=clear_schedule)
+    schedule_w_b.grid(column=3, row=4)
+
+    schedule_time_txt_var = tk.StringVar()
+    schedule_time_txt = tk.Entry(window, textvariable=schedule_time_txt_var)
+    schedule_time_txt.insert(0, '18:00')
+    schedule_time_txt_var.set('18:00')
+    schedule_time_txt.grid(column=3, row=5)
+
+
+
+    load_settings()
+    update_curr_wallpaper_label()
+
+    window.mainloop()
+
+
+if __name__ == "__main__":
+    main()
+

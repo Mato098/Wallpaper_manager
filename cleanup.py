@@ -12,8 +12,8 @@ def key_fun(name) -> int:
     return int(num_str)
 
 
-def cleanup():  # TODO this will not work  if download folder is somwhere else
-    w = os.path.abspath('Wallhaven') + os.sep
+def cleanup(PTH):
+    w = PTH + os.sep
     dirlist = os.listdir(w[:-1])
     dirlist.sort(key=key_fun)
 
@@ -24,12 +24,6 @@ def cleanup():  # TODO this will not work  if download folder is somwhere else
     for name in dirlist:
         suffix = name[-3:]
         if suffix == 'jpg' or suffix == 'png':
-
-            if os.stat(w + name).st_size < 500:
-                os.remove(w + name)
-                n += 1
-                continue
-
             if name[:-3].isdigit() and not rename_rest:
                 number = int(re.findall("[0-9]*", name)[0])
 
@@ -45,5 +39,4 @@ def cleanup():  # TODO this will not work  if download folder is somwhere else
                 os.rename(w + name, w + str(last_numbered_file + 1) + f".{suffix}")
                 sleep(0.2)
                 last_numbered_file += 1
-
-    print('removed', n, 'bad files')
+    print('cleanup done')
