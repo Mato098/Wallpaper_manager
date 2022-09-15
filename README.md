@@ -2,4 +2,5 @@
 
 Mainly a Wallhaven.cc wallpaper downloader and manager
 
-(very much WIP)
+it is nescessary to change path to pythonw.exe in 'wallpaper_manager.py'
+
