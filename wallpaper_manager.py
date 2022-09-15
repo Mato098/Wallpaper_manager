@@ -8,6 +8,7 @@
 
 
 import json
+import random
 import sys
 import tkinter as tk
 import tkinter.messagebox
@@ -112,7 +113,7 @@ def edit_api_key():
     get_text_and_run("Paste your key here:", set_key)
 
 
-def cycle_wallpaper():
+def cycle_wallpaper(given_name=''):
     name = get_wallpaper_name()
     curr_num = int(re.sub("[^0-9]", "", str(name)))
     filepth_lst = re.split('\\\\', os.path.realpath(__file__))
@@ -140,26 +141,35 @@ add-type $code
 }'''
     startupinfo = subprocess.STARTUPINFO()
     startupinfo.dwFlags |= subprocess.STARTF_USESHOWWINDOW
-    for i in range(3):
-        if os.path.exists(f'{PTH}\\{curr_num + 1}.png'):
-            subprocess.Popen(['powershell.exe', f'{a}; Set-Wallpaper(\"{PTH}\\{curr_num + 1}.png\")'],
+    if given_name != '':
+        if os.path.exists(f'{PTH}\\{given_name}.png'):
+            subprocess.Popen(['powershell.exe', f'{a}; Set-Wallpaper(\"{PTH}\\{given_name}.png\")'],
                              startupinfo=startupinfo)
-            break
-        elif os.path.exists(f'{PTH}\\{curr_num + 1}.jpg'):
-            subprocess.Popen(['powershell.exe', f'{a}; Set-Wallpaper(\"{PTH}\\{curr_num + 1}.jpg\")'],
+        else:
+            subprocess.Popen(['powershell.exe', f'{a}; Set-Wallpaper(\"{PTH}\\{given_name}.jpg\")'],
                              startupinfo=startupinfo)
-            break
-        elif i < 1:
-            cleanup.cleanup(PTH)
-            continue
-        if i == 1:
-            curr_num = 0
-            print('going back to 1')
+    else:
+        for i in range(3):
+            if os.path.exists(f'{PTH}\\{curr_num + 1}.png'):
+                subprocess.Popen(['powershell.exe', f'{a}; Set-Wallpaper(\"{PTH}\\{curr_num + 1}.png\")'],
+                                 startupinfo=startupinfo)
+                break
+            elif os.path.exists(f'{PTH}\\{curr_num + 1}.jpg'):
+                subprocess.Popen(['powershell.exe', f'{a}; Set-Wallpaper(\"{PTH}\\{curr_num + 1}.jpg\")'],
+                                 startupinfo=startupinfo)
+                break
+            elif i < 1:
+                cleanup.cleanup(PTH)
+                continue
+            if i == 1:
+                curr_num = 0
+                print('going back to 1')
     time.sleep(0.5)
     try:
         update_curr_wallpaper_label()
     except:
         pass
+
 
 def get_wallpaper_name():
     startupinfo = subprocess.STARTUPINFO()
@@ -179,6 +189,13 @@ def delete_wallpaper():
     cycle_wallpaper()
     os.popen(f'cd {PTH} && DEL {curr_num}.*')
     update_curr_wallpaper_label()
+
+
+def set_random_wallpaper():
+    dirlist = os.listdir(PTH)
+    a = str(random.randint(1, len(dirlist)))
+    print(a)
+    cycle_wallpaper(a)
 
 
 def update_curr_wallpaper_label():
@@ -202,7 +219,7 @@ def open_path():
     subprocess.Popen(['powershell.exe', f'explorer {PTH}'])
 
 
-def delete_duplicates():  # TODO - wallpaper change scheduler, terminal output
+def delete_duplicates():  # TODO - terminal output
     a = dif(PTH, similarity="normal", px_size=50,
             show_progress=True, show_output=False, delete=True, silent_del=True)
     time.sleep(1)
@@ -275,6 +292,8 @@ def main():
     cycle_b.grid(column=2, row=1)
     del_b = tk.Button(window, text='Delete current wallpaper', command=delete_wallpaper)
     del_b.grid(column=2, row=2)
+    random_b = tk.Button(window, text='Set random wallpaper', command=set_random_wallpaper)
+    random_b.grid(column=2, row=3)
 
     dud = tk.Label(window)
     dud.grid(column=0, row=5)
