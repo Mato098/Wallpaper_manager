@@ -282,7 +282,7 @@ def main():
     manage_l.grid(column=1, row=0)
     cleanup_b = tk.Button(window, text='Run cleanup', command=run_cleanup)
     cleanup_b.grid(column=1, row=1)
-    cleanup_l = tk.Label(window, text='sort, delete dud files')
+    cleanup_l = tk.Label(window, text='sort files')
     cleanup_l.grid(column=1, row=2)
     duplicates_b = tk.Button(window, text='Delete duplicates, cleanup', command=delete_duplicates)
     duplicates_b.grid(column=1, row=3)
