@@ -9,3 +9,4 @@ features
 
 it is nescessary to change path to your installation of python - pythonw.exe in 'wallpaper_manager.py'
 
+![image](https://user-images.githubusercontent.com/43574821/190856605-d19606e6-4a98-4808-be69-1659e9899924.png)
